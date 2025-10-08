@@ -2,7 +2,7 @@
 
 ## Student Details
 
-- **Full Name:** `Raahim Khan
+- **Full Name:** `Raahim Khan`
 - **CCID:** `raahim2`
 
 ## References and Resources
