@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements CityDialogFragmen
 
     private Button addCityButton;
     private ListView cityListView;
+    private Button deleteCityButton;
 
     private ArrayList<City> cityArrayList;
     private ArrayAdapter<City> cityArrayAdapter;
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements CityDialogFragmen
         // Set views
         addCityButton = findViewById(R.id.buttonAddCity);
         cityListView = findViewById(R.id.listviewCities);
+        deleteCityButton = findViewById(R.id.buttonDeleteCity);
 
         // create city array
         cityArrayList = new ArrayList<>();
@@ -66,6 +69,21 @@ public class MainActivity extends AppCompatActivity implements CityDialogFragmen
             City city = cityArrayAdapter.getItem(i);
             CityDialogFragment cityDialogFragment = CityDialogFragment.newInstance(city);
             cityDialogFragment.show(getSupportFragmentManager(),"City Details");
+        });
+
+        deleteCityButton.setOnClickListener(view -> {
+            Toast.makeText(this, "Tap a city to delete", Toast.LENGTH_SHORT).show();
+
+            cityListView.setOnItemClickListener((adapterView, view1, position, id) -> {
+                City cityToDelete = cityArrayList.get(position);
+                deleteCity(cityToDelete);
+                // reset normal click behavior after one deletion
+                cityListView.setOnItemClickListener((a, v, i, l) -> {
+                    City city = cityArrayAdapter.getItem(i);
+                    CityDialogFragment dialog = CityDialogFragment.newInstance(city);
+                    dialog.show(getSupportFragmentManager(), "City Details");
+                });
+            });
         });
 
         db = FirebaseFirestore.getInstance(); // added this line
@@ -90,12 +108,17 @@ public class MainActivity extends AppCompatActivity implements CityDialogFragmen
 
     @Override
     public void updateCity(City city, String title, String year) {
+        String oldName = city.getName();
+
         city.setName(title);
         city.setProvince(year);
         cityArrayAdapter.notifyDataSetChanged();
 
-        // Updating the database using delete + addition
+        citiesRef.document(oldName).delete();
+        City updatedCity = new City(title, year);
+        citiesRef.document(title).set(updatedCity);
     }
+
 
     @Override
     public void addCity(City city){
@@ -108,9 +131,13 @@ public class MainActivity extends AppCompatActivity implements CityDialogFragmen
     }
 
     // @Override
-    public void deleteCity(City city){
+    public void deleteCity(City city) {
+        citiesRef.document(city.getName()).delete();
 
-    };
+        cityArrayList.remove(city);
+        cityArrayAdapter.notifyDataSetChanged();
+    }
+
 
     public void addDummyData(){
         City m1 = new City("Edmonton", "AB");
