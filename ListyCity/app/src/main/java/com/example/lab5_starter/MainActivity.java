@@ -37,9 +37,6 @@ public class MainActivity extends AppCompatActivity implements CityDialogFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-
-
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -109,6 +106,11 @@ public class MainActivity extends AppCompatActivity implements CityDialogFragmen
         docRef.set(city);
 
     }
+
+    // @Override
+    public void deleteCity(City city){
+
+    };
 
     public void addDummyData(){
         City m1 = new City("Edmonton", "AB");
